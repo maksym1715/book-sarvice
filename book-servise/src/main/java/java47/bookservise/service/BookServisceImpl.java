@@ -2,11 +2,8 @@ package java47.bookservise.service;
 
 
 
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import javax.persistence.EntityNotFoundException;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -60,6 +57,7 @@ public class BookServisceImpl implements BookService {
 	}
 
 	@Override
+	@Transactional
 	public BookDto removeBook(String isbn) {
 		Book book = bookRepository.findById(isbn).orElseThrow(() -> new EntityNotFounfExeption());
 		bookRepository.deleteById(isbn);
@@ -67,24 +65,24 @@ public class BookServisceImpl implements BookService {
 	}
 
 	@Override
+	@Transactional
 	public BookDto updateBookTitle(String isbn, String title) {
 		Book book = bookRepository.findById(isbn).orElseThrow(() -> new EntityNotFounfExeption());
 		book.setTitle(title);
-		bookRepository.save(book);
 		return modelMapper.map(book, BookDto.class);
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public Iterable<BookDto> findBookByAuthor(String author) {    
-	    return bookRepository.findBooksByAuthors(author)
+	public Iterable<BookDto> findBookByAuthor(String authorName) {    
+	    return bookRepository.findByAuthorsName(authorName)
 				.map(p -> modelMapper.map(p, BookDto.class))
 				.collect(Collectors.toList());
 	}
 
 	@Override
-	public Iterable<BookDto> findBooksByPublisher(String publisher) {
-		return bookRepository.findByPublisher(publisher)
+	public Iterable<BookDto> findBooksByPublisher(String publisherName) {
+		return bookRepository.findByPublisherPublisherName(publisherName)
 				.map(p -> modelMapper.map(p, BookDto.class))
 				.collect(Collectors.toList());
 	}
@@ -95,6 +93,22 @@ public class BookServisceImpl implements BookService {
 	 Book book = bookRepository.findById(isbn).orElseThrow(() -> new EntityNotFounfExeption()); 
 	  return book.getAuthors().stream().map(author -> modelMapper.map(author, AuthorDto.class)) .collect(Collectors.toList()); 
 	  }
+
+	@Override
+	public Iterable<String> findPublishersByAuthor(String authorName) {
+		
+		return publisherRepository.findPublisherByAuthor(authorName);
+	}
+
+	@Override
+	@Transactional
+	public AuthorDto removeAuthor(String authorName) {
+		Author author = authorRepository.findById(authorName).orElseThrow(() -> new EntityNotFounfExeption());
+		bookRepository.findByAuthorsName(authorName).forEach(b-> bookRepository.delete(b));
+		authorRepository.delete(author);
+		
+		return modelMapper.map(author, AuthorDto.class);
+	}
 	  
 	/*
 	 * @Override public List<String> findPublishersByAuthor(String author) {

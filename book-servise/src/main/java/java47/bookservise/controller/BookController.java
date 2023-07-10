@@ -1,7 +1,5 @@
 package java47.bookservise.controller;
 
-import java.util.List;
-
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,13 +41,13 @@ public class BookController  {
     }
 
     @GetMapping("/books/author/{author}")
-    public Iterable<BookDto> findBookByAuthor(@PathVariable String author) {
-        return bookService.findBookByAuthor(author);
+    public Iterable<BookDto> findBookByAuthor(@PathVariable String authorName) {
+        return bookService.findBookByAuthor(authorName);
     }
 
     @GetMapping("/books/publisher/{publisher}")
-    public Iterable<BookDto> findBooksByPublisher(@PathVariable String publisher) {
-        return bookService.findBooksByPublisher(publisher);
+    public Iterable<BookDto> findBooksByPublisher(@PathVariable String publisherName) {
+        return bookService.findBooksByPublisher(publisherName);
     }
 
 
@@ -58,9 +56,14 @@ public class BookController  {
 		  return bookService.findBookAuthors(isbn); 
 	  }
 	  
-//	  @GetMapping("/publishers/author/{author}") public List<String>
-//	  findPublishersByAuthor(@PathVariable String author) { return
-//	  bookService.findPublishersByAuthor(author); }
+	  @DeleteMapping("/author/{author}")
+	    public BookDto removeAuthor(@PathVariable String authorName) {
+	        return bookService.removeBook(authorName);
+	    }
+	  
+	  @GetMapping("/publishers/author/{author}") 
+	  public Iterable<String> findPublishersByAuthor(@PathVariable String author)
+	  { return bookService.findPublishersByAuthor(author); }
 	 
 
 }
